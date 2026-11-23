@@ -1,6 +1,6 @@
 # AutoISO-DxOPureRaw
 
-Ein kleines Windows-Tool, das in einem Ordner alle RAW-Dateien über einem einstellbaren ISO-Wert heraussucht und an **DxO PureRAW 5** übergibt. So landen nur die rauschanfälligen High-ISO-Bilder in der Entrauschung.
+Ein kleines Windows-Tool, das in einem Ordner alle RAW-Dateien über einem einstellbaren ISO-Wert heraussucht und an **DxO PureRAW 5 oder 6** übergibt. So landen nur die rauschanfälligen High-ISO-Bilder in der Entrauschung.
 
 ## Funktionen
 
@@ -14,6 +14,7 @@ Ein kleines Windows-Tool, das in einem Ordner alle RAW-Dateien über einem einst
   - **Mit Vorschau**: PureRAW öffnet sich mit den Bildern, die Einstellungen wählst du dort.
   - **Sofort verarbeiten**
   - **Sofort mit zuletzt verwendeten Einstellungen**
+- Erkennt alle installierten PureRAW-Versionen. Standard ist „Automatisch“, also die neueste Version, du kannst aber auch eine bestimmte Version wählen.
 - Grafische Oberfläche und Kommandozeilenmodus.
 - Die Einstellungen werden in `settings.json` gespeichert.
 
@@ -21,7 +22,7 @@ Ein kleines Windows-Tool, das in einem Ordner alle RAW-Dateien über einem einst
 
 - Windows
 - Python 3.10 oder neuer, mit tkinter (bei der Standardinstallation von python.org enthalten)
-- DxO PureRAW 5. Das Tool findet es automatisch unter `C:\Program Files\DxO\`, der Pfad lässt sich aber auch von Hand angeben.
+- DxO PureRAW 5 oder 6. Das Tool findet die Installationen automatisch unter `C:\Program Files\DxO\`, der Pfad lässt sich aber auch von Hand angeben.
 
 ## Benutzung
 
@@ -51,14 +52,15 @@ python auto_iso_dxo_pureraw.py --folder "D:\Fotos\Konzert" --iso 3200 --dry-run
 | `--recursive` | Unterordner einbeziehen |
 | `--include-processed` | bereits verarbeitete Bilder nicht überspringen |
 | `--mode preview\|instant\|last` | Übergabe-Modus (siehe oben) |
-| `--pureraw` | Pfad zur `PureRAWv5.exe` |
+| `--pureraw` | Pfad zu einer bestimmten PureRAW-EXE (ohne Angabe: neueste Version) |
+| `--list-pureraw` | installierte PureRAW-Versionen anzeigen |
 | `--dry-run` | nur auflisten, nichts an PureRAW senden |
 
 Werte, die nicht angegeben werden, kommen aus `settings.json`.
 
 ## Wie die Übergabe an PureRAW funktioniert
 
-PureRAW 5 ignoriert Bildpfade, die direkt auf der Kommandozeile stehen. Das Tool macht es deshalb wie DxOs eigenes Lightroom-Plugin: Es schreibt die Dateien in eine temporäre Liste und startet PureRAW im Plugin-Modus.
+PureRAW ignoriert Bildpfade, die direkt auf der Kommandozeile stehen. Das Tool macht es deshalb wie DxOs eigenes Lightroom-Plugin: Es schreibt die Dateien in eine temporäre Liste und startet PureRAW im Plugin-Modus.
 
 ```
 PureRAWv5.exe --as-lightroom-preview-plugin --lr-version=14.0 --batch-file <liste.txt>
@@ -66,9 +68,12 @@ PureRAWv5.exe --as-lightroom-preview-plugin --lr-version=14.0 --batch-file <list
 
 Der Modus-Schalter übernimmt das nächste Argument als seinen Wert, deshalb muss `--lr-version` direkt danach stehen. PureRAW löscht die Liste nach dem Einlesen selbst.
 
+Die Namen dieser Optionen liest das Tool aus der Datei `LightroomPluginData\*.lrplugin\PluginData.lua`, die DxO mit jeder Version mitliefert. Benennt DxO sie in einer neuen Version um, passt sich die Übergabe automatisch an. Fehlt die Datei, gelten die Werte von PureRAW 5.
+
 ## Hinweise
 
 - Getestet ist das Tool mit PureRAW 5. Der Modus „Mit Vorschau“ ist geprüft, die beiden Sofort-Modi noch nicht.
+- Die Unterstützung für PureRAW 6 ist nur mit einer simulierten Installation getestet. Ob die Übergabe mit dem echten PureRAW 6 funktioniert, ist noch offen.
 - Erscheint bei einer Kamera „ISO nicht lesbar“, kennt der eingebaute EXIF-Leser das Format noch nicht. Ein Issue mit Kameramodell und, wenn möglich, einer Beispieldatei hilft weiter.
 
 ## Dateien
