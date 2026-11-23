@@ -1,0 +1,6 @@
+# persönliche Einstellungen (lokale Pfade)
+settings.json
+
+# Python
+__pycache__/
+*.pyc
