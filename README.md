@@ -15,19 +15,44 @@ Ein kleines Windows-Tool, das in einem Ordner alle RAW-Dateien über einem einst
   - **Sofort verarbeiten**
   - **Sofort mit zuletzt verwendeten Einstellungen**
 - Grafische Oberfläche und Kommandozeilenmodus.
-- Die Einstellungen werden in `settings.json` gespeichert.
+- Die Einstellungen werden in `settings.json` gespeichert. Beim Python-Skript liegt die Datei neben dem Skript, bei der EXE unter `%APPDATA%\AutoISO-DxOPureRaw\`.
+- Gibt es auch als EXE, die ohne installiertes Python läuft (siehe [EXE-Version](#exe-version)).
 
 ## Voraussetzungen
 
 - Windows
-- Python 3.10 oder neuer, mit tkinter (bei der Standardinstallation von python.org enthalten)
 - DxO PureRAW 5. Das Tool findet es automatisch unter `C:\Program Files\DxO\`, der Pfad lässt sich aber auch von Hand angeben.
+- Nur für das Python-Skript: Python 3.10 oder neuer, mit tkinter (bei der Standardinstallation von python.org enthalten). Die EXE braucht kein Python.
+
+## EXE-Version
+
+`build.bat` baut zwei eigenständige Programme nach `dist\`, je etwa 12 MB groß:
+
+| Datei | Zweck |
+|---|---|
+| `AutoISO-DxOPureRaw.exe` | Oberfläche, startet ohne Konsolenfenster |
+| `AutoISO-DxOPureRaw-cli.exe` | Kommandozeile mit denselben Optionen wie unten, Ausgabe und Exit-Code erscheinen in der Konsole |
+
+Weitergeben musst du nur die EXE, Python braucht der Empfänger nicht. Zum Bauen selbst ist Python nötig. `build.bat` legt dafür eine eigene Umgebung `.venv-build` an und installiert PyInstaller nur dort.
+
+```powershell
+.\build.bat
+```
+
+Die Kommandozeile hat eine eigene EXE, weil eine EXE ohne Konsolenfenster keine Ausgabe in die aufrufende Konsole schreiben kann. PowerShell würde außerdem nicht auf sie warten.
+
+Hinweise zur EXE:
+
+- Die EXE ist nicht signiert. Beim ersten Start kann Windows SmartScreen warnen („Der Computer wurde durch Windows geschützt“). Über „Weitere Informationen“ und „Trotzdem ausführen“ startet sie. Vereinzelt schlagen Virenscanner bei PyInstaller-Programmen fälschlich an.
+- Jeder Start dauert ein bis zwei Sekunden länger als beim Skript, weil sich die EXE zuerst in einen temporären Ordner entpackt.
 
 ## Benutzung
 
 ### Oberfläche
 
-Doppelklick auf `Auto ISO DxO PureRaw.bat`, alternativ:
+Mit der EXE: Doppelklick auf `AutoISO-DxOPureRaw.exe`.
+
+Mit Python: Doppelklick auf `Auto ISO DxO PureRaw.bat`, alternativ:
 
 ```powershell
 python auto_iso_dxo_pureraw.py
@@ -41,6 +66,12 @@ python auto_iso_dxo_pureraw.py
 
 ```powershell
 python auto_iso_dxo_pureraw.py --folder "D:\Fotos\Konzert" --iso 3200 --dry-run
+```
+
+Mit der EXE genauso, nur `AutoISO-DxOPureRaw-cli.exe` statt `python auto_iso_dxo_pureraw.py`:
+
+```powershell
+.\AutoISO-DxOPureRaw-cli.exe --folder "D:\Fotos\Konzert" --iso 3200 --dry-run
 ```
 
 | Option | Bedeutung |
@@ -77,4 +108,5 @@ Der Modus-Schalter übernimmt das nächste Argument als seinen Wert, deshalb mus
 |---|---|
 | `auto_iso_dxo_pureraw.py` | Oberfläche, Kommandozeile und Übergabe an PureRAW |
 | `exif_iso.py` | abhängigkeitsfreier ISO-Leser für RAW-Dateien |
-| `Auto ISO DxO PureRaw.bat` | startet die Oberfläche ohne Konsolenfenster |
+| `Auto ISO DxO PureRaw.bat` | startet die Oberfläche ohne Konsolenfenster (Python nötig) |
+| `build.bat` | baut die beiden EXEs nach `dist\` |
