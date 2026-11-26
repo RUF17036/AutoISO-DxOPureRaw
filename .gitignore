@@ -4,3 +4,9 @@ settings.json
 # Python
 __pycache__/
 *.pyc
+
+# EXE-Build (build.bat)
+.venv-build/
+build/
+dist/
+*.spec

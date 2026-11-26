@@ -20,8 +20,23 @@ from pathlib import Path
 
 from exif_iso import read_iso
 
-APP_DIR = Path(__file__).resolve().parent
-SETTINGS_FILE = APP_DIR / "settings.json"
+FROZEN = getattr(sys, "frozen", False)   # True, wenn als EXE (PyInstaller) gestartet
+
+
+def _settings_file() -> Path:
+    """Als Skript: settings.json neben dem Skript. Als EXE: unter %APPDATA%.
+
+    Eine --onefile-EXE entpackt sich bei jedem Start in einen temporären Ordner, der danach
+    gelöscht wird. Neben der EXE ist es auch nicht sicher, denn unter C:\\Program Files
+    darf ein normales Programm nicht schreiben.
+    """
+    if not FROZEN:
+        return Path(__file__).resolve().parent / "settings.json"
+    base = Path(os.environ.get("APPDATA") or Path.home()) / "AutoISO-DxOPureRaw"
+    return base / "settings.json"
+
+
+SETTINGS_FILE = _settings_file()
 
 RAW_EXTENSIONS = {
     ".cr2", ".cr3", ".crw", ".nef", ".nrw", ".arw", ".srf", ".sr2", ".dng",
@@ -138,6 +153,7 @@ def load_settings() -> dict:
 
 def save_settings(s: dict) -> None:
     try:
+        SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
         SETTINGS_FILE.write_text(json.dumps(s, indent=2, ensure_ascii=False), encoding="utf-8")
     except OSError:
         pass
